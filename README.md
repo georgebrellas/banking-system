@@ -1,4 +1,4 @@
-### Bank Transaction System v2.2.1 ###
+### Bank Transaction System v2.2.3 ###
 **Made by @Georgegreece**
 This System was made as a fun little side project and it's still just that.
 It has many features already and more will come.
@@ -16,6 +16,28 @@ Example:
 ```python
 Accounts["p1"] = Person("John D.", newAccountNumber(), 0)
 ```
+Also, each account has a `log` dictionary where it stores it's logs.
+The logs are stored with the `YEAR-MONTH-DAY-HOUR:MINUTE` format.
+Example:
+```python
+print(Accounts["p1"].log["2017-07-21-15:32"])
+```
+This should return the exact transaction that happened on that date and time.
+The program uses the `saveLog()` function.
+It is not recommended to save manually unless implementing a new feature.
+But here it is:
+Function `saveLog(money,action,accTo)`
+Example:
+```python
+Accounts["p1"].saveLog(444,"t",221)
+```
+Saves a transaction log depending on the specified `action`
+```
+"d" = Deposit
+"t" = Transfer
+"w" = Withdraw
+```
+*Note: Only transfers need the accTo, for everything else just send an empty string*
 # Functions #
 ##### Return Codes #####
 Return codes are an important way of knowing what happened in the program.
@@ -31,6 +53,7 @@ You can also find the codes on the top of the `Bank.py` file.
 6 = Account Number Not A Number
 7 = Pin Length Not 4
 8 = Incorrect Pin
+9 = Unexpected Error (AKA this shouldn't be happening)
 ```
 ### Account Operations ###
 
@@ -53,6 +76,17 @@ Example:
 findAccount(554)
 ```
 Returns the account's dictionary name.
+
+##### Getting an Account #####
+Function:
+`getAccount(Number)` 
+
+Example:
+```python
+getAccount(554)
+```
+Returns the account for simple function usage.
+
 ##### Getting an Account's Information #####
 *Note: You can use either the Dictionary Name or the Account's Number*
 Function:
@@ -65,6 +99,15 @@ info("p1")
 ```
 Returns the account's `Number`, `Holder` and `Money`
 
+##### Clearing the logs #####
+Function:
+`clearLog(Account)` 
+
+Example:
+```python
+clearLog(554)
+```
+Clears the account's Logs.
 ### Money Operations ###
 
 ##### Depositing Money #####
@@ -148,4 +191,3 @@ Example:
 hashPin(1234)
 ```
 Hashes the PIN `1234` and returns the hash.
-
