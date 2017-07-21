@@ -2,7 +2,6 @@
 ##########################
 __pycache__/
 .pyc
-*.pkl
 # OS generated files #
 ######################
 .DS_Store

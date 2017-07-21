@@ -1,4 +1,4 @@
-#  Bank of Kekisan Transaction System v2.2.1
+#  Bank of Kekisan Transaction System v2.2.3
 #         Made by @Georgegreece        
 #This bank is fictional if it wasn't obvious. 
 
@@ -12,9 +12,11 @@
 #6 = Account number not a number
 #7 = Pin length not 4
 #8 = Incorrect Pin
+#9 = Unexpected Error (AKA this shouldn't be happening)
 
 from NumberCheck import *
 from AccountNumberGenerator import *
+from time import localtime, strftime
 import random
 import math
 import os
@@ -40,7 +42,10 @@ def load():
 def clear():
     global Accounts
     Accounts = {}
-    os.remove(AccFile + ".pkl")
+    try:
+        os.remove(AccFile + ".pkl")
+    except FileNotFoundError:
+        return
 
 #Assigns a new hashed pin to an account.
 def newPin(Pin,Account):
@@ -73,6 +78,19 @@ def info(Account):
         return Accounts[Account].info()
     else:
         return Accounts[findAccount(Account)].info()
+#Clears the user's log
+    
+def clearLog(Account):
+    if not is_number(Account):
+        Accounts[Account].clearLog()
+        return 0
+    else:
+        Accounts[findAccount(Account)].clearLog()
+        return 0
+
+#Simple way to access an account
+def getAccount(Number):
+    return Accounts[findAccount(Number)]
 
 #Find an account's dictionary name from his number.
 def findAccount(Number):
@@ -143,6 +161,7 @@ class Person:
         self.number = number
         self.money = money
         self.pin = pin
+        self.log = {}
     def info(self):
         number = self.number
         holder = self.name
@@ -166,6 +185,7 @@ class Person:
         if int(DepositAmount) <= 0:
             return 2
         self.money = self.money + int(DepositAmount)
+        self.saveLog(DepositAmount,"d","")
         #See above.
         #print("Successfully deposited $" + str(DepositAmmount) + " to account number: " + str(self.number))
 
@@ -179,8 +199,34 @@ class Person:
         else:
             Accounts[TransferTo].money += int(TransferAmount)
             self.money -= int(TransferAmount)
+            self.saveLog(TransferAmount,"t", TransferTo)
             return 0
         
+    def saveLog(self,money,action,accTo):
+        sysTime = strftime("%Y-%m-%d %H:%M:%S", localtime())
+        logTime = strftime("%Y-%m-%d-%H:%M", localtime())
+        if action == "d":
+            log = str(sysTime) + ": Deposited $" + str(money)
+            self.log[logTime] = log
+            return 0
+        
+        elif action == "w":
+            log = str(sysTime) + ": Withdrew $" + str(money)
+            self.log[logTime] = log
+            return 0
+        
+        elif action == "t":
+            log = str(sysTime) + ": Transfered $" + str(money) + " to " + str(Accounts[accTo].name) + "(" + str(Accounts[accTo].number) + ")"
+            self.log[logTime] = log
+            return 0
+        else:
+            print("Unknown action!? Please don't mess with me <3")
+            return 9
+        
+    def clearLog(self):
+        self.log = {}
+        return 0
+        
 #Test accounts. Can be safely deleted.
-#Accounts["p1"] = Person("Bank",0,50)
-#Accounts["p2"] = Person("Stud",1,10)
+#Accounts["p1"] = Person("Bank",0,50,1111)
+#Accounts["p2"] = Person("Stud",1,10,1111)
